@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Muay Thai Tings"
-date:   2022-06-26 16:42:29 -0700
+date:   2022-07-06 02:44:29 -0700
 categories: jekyll update
 ---
 
