@@ -45,6 +45,7 @@ GEM
     listen (3.7.1)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
+    logger (1.7.0)
     mercenary (0.4.0)
     minima (2.5.1)
       jekyll (>= 3.5, < 5.0)
@@ -66,6 +67,7 @@ GEM
     unicode-display_width (1.8.0)
 
 PLATFORMS
+  arm64-darwin-23
   universal-darwin-21
   universal-darwin-22
 
@@ -73,10 +75,11 @@ DEPENDENCIES
   http_parser.rb (~> 0.6.0)
   jekyll (~> 4.2.2)
   jekyll-feed (~> 0.12)
+  logger
   minima (~> 2.5)
   tzinfo (~> 1.2)
   tzinfo-data
   wdm (~> 0.1.1)
 
 BUNDLED WITH
-   2.3.16
+  4.0.4
