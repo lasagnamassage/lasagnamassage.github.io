@@ -1,0 +1,627 @@
+/* Terminal Styles */
+.terminal-container {
+  font-family: 'Courier New', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 1.56em;
+  background-color: #0d1117;
+  color: #00ff00;
+  padding: 20px;
+  border-radius: 0;
+  max-width: 100%;
+  width: 100vw;
+  height: 100vh;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  margin: 0;
+}
+
+.terminal-output {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 10px;
+  max-height: calc(100vh - 100px);
+  scroll-behavior: smooth;
+}
+
+.terminal-output::-webkit-scrollbar {
+  width: 8px;
+}
+
+.terminal-output::-webkit-scrollbar-track {
+  background: #161b22;
+}
+
+.terminal-output::-webkit-scrollbar-thumb {
+  background: #30363d;
+  border-radius: 4px;
+}
+
+.terminal-output::-webkit-scrollbar-thumb:hover {
+  background: #484f58;
+}
+
+.terminal-line {
+  margin: 5px 0;
+  line-height: 1.6;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  overflow: visible;
+  min-height: 1.6em;
+}
+
+/* Allow zalgo text to display fully */
+.terminal-line .terminal-info {
+  line-height: 2;
+  overflow: visible;
+}
+
+.terminal-prompt {
+  color: #00ff00;
+  font-weight: bold;
+  margin-right: 8px;
+}
+
+.terminal-input-line {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+  position: relative;
+}
+
+.terminal-input-line .prompt {
+  color: #00ff00;
+  font-weight: bold;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.terminal-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #00ff00;
+  font-family: inherit;
+  font-size: inherit;
+  outline: none;
+  caret-color: #00ff00;
+}
+
+.terminal-input:focus {
+  outline: none;
+}
+
+.terminal-input:focus + .cursor {
+  opacity: 1;
+}
+
+.cursor {
+  display: inline-block;
+  width: 8px;
+  height: 1.2em;
+  background-color: #00ff00;
+  margin-left: 2px;
+  animation: blink 1s infinite;
+  vertical-align: middle;
+}
+
+@keyframes blink {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0;
+  }
+}
+
+/* Terminal colors for different message types */
+.terminal-command {
+  color: #00ff00;
+}
+
+.terminal-output-text {
+  color: #c9d1d9;
+}
+
+.terminal-error {
+  color: #ff4444;
+}
+
+.terminal-success {
+  color: #00ff88;
+}
+
+.terminal-info {
+  color: #58a6ff;
+}
+
+.terminal-warning {
+  color: #ffaa00;
+}
+
+.terminal-code {
+  color: #00ff88;
+  font-family: 'Courier New', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  background-color: rgba(0, 255, 136, 0.1);
+  padding: 2px 4px;
+  border-radius: 2px;
+}
+
+/* Help command styling */
+.terminal-help {
+  margin: 10px 0;
+}
+
+.terminal-help-item {
+  display: flex;
+  margin: 5px 0;
+  padding-left: 20px;
+}
+
+.terminal-help-command {
+  color: #00ff00;
+  min-width: 150px;
+  font-weight: bold;
+}
+
+.terminal-help-description {
+  color: #c9d1d9;
+}
+
+/* Post listing styling */
+.terminal-post-list {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0;
+}
+
+.terminal-post-item {
+  padding: 5px 0;
+  color: #c9d1d9;
+}
+
+.terminal-post-link {
+  color: #58a6ff;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.terminal-post-link:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+.terminal-post-date {
+  color: #8b949e;
+  margin-left: 10px;
+}
+
+/* About/Skills styling */
+.terminal-section {
+  margin: 15px 0;
+  padding-left: 20px;
+}
+
+.terminal-section-title {
+  color: #00ff00;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .terminal-container {
+    padding: 15px;
+    font-size: 14px;
+  }
+  
+  .terminal-help-command {
+    min-width: 120px;
+  }
+  
+  .terminal-container {
+    padding: 15px;
+    font-size: 14px;
+  }
+  
+  .mode-toggle {
+    top: 10px;
+    right: 10px;
+    padding: 8px 16px;
+    font-size: 12px;
+  }
+  
+  .terminal-output {
+    max-height: calc(100vh - 120px);
+  }
+}
+
+/* Accessibility - Focus indicators */
+.terminal-input:focus-visible {
+  outline: 2px solid #58a6ff;
+  outline-offset: 2px;
+}
+
+/* Screen reader only text */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* No JavaScript fallback */
+.no-js-message {
+  padding: 20px;
+  background-color: #161b22;
+  color: #c9d1d9;
+  border-radius: 4px;
+  text-align: center;
+}
+
+/* Integration with CRT effect */
+.crt .terminal-container {
+  position: relative;
+  z-index: 1;
+}
+
+/* Apply CRT effect to terminal */
+.crt .terminal-container::before,
+.crt .terminal-container::after {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1001;
+  pointer-events: none;
+}
+
+/* Mode toggle button */
+.mode-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  padding: 10px 20px;
+  background-color: rgba(0, 255, 0, 0.1);
+  border: 1px solid #00ff00;
+  color: #00ff00;
+  font-family: 'Courier New', monospace;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+/* Ensure button is visible in simple mode */
+body.simple-mode .mode-toggle,
+.simple-mode.active ~ .mode-toggle {
+  z-index: 10000;
+  display: block !important;
+}
+
+.mode-toggle:hover {
+  background-color: rgba(0, 255, 0, 0.2);
+}
+
+.mode-toggle:focus {
+  outline: 2px solid #58a6ff;
+  outline-offset: 2px;
+}
+
+/* Simple mode layout - handled above */
+
+.terminal-mode .terminal-container {
+  display: flex;
+}
+
+.terminal-mode .simple-mode {
+  display: none !important;
+}
+
+.simple-mode.active ~ .terminal-container {
+  display: none !important;
+}
+
+.simple-mode.active .terminal-container {
+  display: none !important;
+}
+
+body.simple-mode .terminal-container {
+  display: none !important;
+}
+
+/* Ensure simple-mode is visible when body has simple-mode class */
+body.simple-mode .simple-mode,
+body.simple-mode .simple-mode.active {
+  display: block !important;
+}
+
+/* Hide page content in simple mode */
+body.simple-mode .page-content,
+body.simple-mode .wrapper,
+body.simple-mode main {
+  display: none !important;
+}
+
+/* Hide header and footer on home page in terminal mode */
+.terminal-mode header,
+.terminal-mode footer,
+.terminal-mode .site-header,
+.terminal-mode .site-footer {
+  display: none;
+}
+
+body.terminal-mode {
+  overflow-y: hidden;
+}
+
+.terminal-mode .page-content {
+  padding: 0;
+  margin: 0;
+}
+
+.terminal-mode .wrapper {
+  padding: 0;
+  margin: 0;
+  max-width: 100%;
+}
+
+/* Make CRT effects visible on dark terminal background */
+.terminal-mode .crt::before {
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(255, 255, 255, 0.12) 50%
+  ), 
+  linear-gradient(
+    90deg, 
+    rgba(255, 0, 0, 0.15), 
+    rgba(0, 255, 0, 0.08), 
+    rgba(0, 0, 255, 0.15)
+  );
+  background-size: 100% 2px, 3px 100%;
+  z-index: 1001 !important;
+}
+
+/* Make flicker overlay visible on dark terminal background */
+.terminal-mode .crt::after {
+  background: rgba(255, 255, 255, 0.05) !important;
+  z-index: 1001 !important;
+}
+
+/* Ensure CRT effects are above terminal container */
+body.terminal-mode.crt::before,
+body.terminal-mode.crt::after {
+  z-index: 1001 !important;
+}
+
+/* Make text shadow more visible on dark terminal background */
+.terminal-mode .crt,
+.terminal-mode .crt * {
+  animation: textShadowTerminal 1.6s infinite;
+}
+
+/* Enhanced text shadow animation for dark backgrounds - more visible */
+@keyframes textShadowTerminal {
+  0% {
+    text-shadow: 0.4389924193300864px 0 2px rgba(0,150,255,0.5), -0.4389924193300864px 0 2px rgba(255,100,150,0.4), 0 0 4px;
+  }
+  5% {
+    text-shadow: 2.7928974010788217px 0 2px rgba(0,150,255,0.5), -2.7928974010788217px 0 2px rgba(255,100,150,0.4), 0 0 4px;
+  }
+  10% {
+    text-shadow: 0.02956275843481219px 0 2px rgba(0,150,255,0.5), -0.02956275843481219px 0 2px rgba(255,100,150,0.4), 0 0 4px;
+  }
+  15% {
+    text-shadow: 0.40218538552878136px 0 2px rgba(0,150,255,0.5), -0.40218538552878136px 0 2px rgba(255,100,150,0.4), 0 0 4px;
+  }
+  20% {
+    text-shadow: 3.4794037899852017px 0 2px rgba(0,150,255,0.5), -3.4794037899852017px 0 2px rgba(255,100,150,0.4), 0 0 4px;
+  }
+  25% {
+    text-shadow: 1.6125630401149584px 0 2px rgba(0,150,255,0.5), -1.6125630401149584px 0 2px rgba(255,100,150,0.4), 0 0 4px;
+  }
+  30% {
+    text-shadow: 0.7015590085143956px 0 2px rgba(0,150,255,0.5), -0.7015590085143956px 0 2px rgba(255,100,150,0.4), 0 0 4px;
+  }
+  35% {
+    text-shadow: 3.896914047650351px 0 2px rgba(0,150,255,0.5), -3.896914047650351px 0 2px rgba(255,100,150,0.4), 0 0 4px;
+  }
+  40% {
+    text-shadow: 3.870905614848819px 0 2px rgba(0,150,255,0.5), -3.870905614848819px 0 2px rgba(255,100,150,0.4), 0 0 4px;
+  }
+  45% {
+    text-shadow: 2.231056963361899px 0 2px rgba(0,150,255,0.5), -2.231056963361899px 0 2px rgba(255,100,150,0.4), 0 0 4px;
+  }
+  50% {
+    text-shadow: 0.08084290417898504px 0 2px rgba(0,150,255,0.5), -0.08084290417898504px 0 2px rgba(255,100,150,0.4), 0 0 4px;
+  }
+  55% {
+    text-shadow: 2.3758461067427543px 0 2px rgba(0,150,255,0.5), -2.3758461067427543px 0 2px rgba(255,100,150,0.4), 0 0 4px;
+  }
+  60% {
+    text-shadow: 2.202193051050636px 0 2px rgba(0,150,255,0.5), -2.202193051050636px 0 2px rgba(255,100,150,0.4), 0 0 4px;
+  }
+  65% {
+    text-shadow: 2.8638780614874975px 0 2px rgba(0,150,255,0.5), -2.8638780614874975px 0 2px rgba(255,100,150,0.4), 0 0 4px;
+  }
+  70% {
+    text-shadow: 0.48874025155497314px 0 2px rgba(0,150,255,0.5), -0.48874025155497314px 0 2px rgba(255,100,150,0.4), 0 0 4px;
+  }
+  75% {
+    text-shadow: 1.8948491305757957px 0 2px rgba(0,150,255,0.5), -1.8948491305757957px 0 2px rgba(255,100,150,0.4), 0 0 4px;
+  }
+  80% {
+    text-shadow: 0.0833037308038857px 0 2px rgba(0,150,255,0.5), -0.0833037308038857px 0 2px rgba(255,100,150,0.4), 0 0 4px;
+  }
+  85% {
+    text-shadow: 0.09769827255241735px 0 2px rgba(0,150,255,0.5), -0.09769827255241735px 0 2px rgba(255,100,150,0.4), 0 0 4px;
+  }
+  90% {
+    text-shadow: 3.443339761481782px 0 2px rgba(0,150,255,0.5), -3.443339761481782px 0 2px rgba(255,100,150,0.4), 0 0 4px;
+  }
+  95% {
+    text-shadow: 2.1841838852799786px 0 2px rgba(0,150,255,0.5), -2.1841838852799786px 0 2px rgba(255,100,150,0.4), 0 0 4px;
+  }
+  100% {
+    text-shadow: 2.6208764473832513px 0 2px rgba(0,150,255,0.5), -2.6208764473832513px 0 2px rgba(255,100,150,0.4), 0 0 4px;
+  }
+}
+
+/* Simple mode styling */
+.simple-mode {
+  min-height: 100vh;
+  background-color: #0d1117;
+  padding: 20px 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 9999;
+}
+
+/* Show simple-mode when active OR when body has simple-mode class */
+.simple-mode.active,
+body.simple-mode .simple-mode {
+  display: block !important;
+}
+
+/* Body background for simple mode */
+body.simple-mode,
+body.simple-mode html {
+  background-color: #0d1117 !important;
+  overflow: hidden;
+}
+
+body.simple-mode .page-content {
+  background-color: #0d1117;
+}
+
+.simple-mode-content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  color: #c9d1d9;
+  line-height: 1.8;
+}
+
+.simple-mode-content h1 {
+  font-size: 2.5em;
+  margin-bottom: 20px;
+  color: #00ff00;
+}
+
+.simple-mode-content h2 {
+  font-size: 2em;
+  margin-top: 40px;
+  margin-bottom: 20px;
+  color: #00ff00;
+}
+
+.simple-mode-content img {
+  max-width: 300px;
+  border-radius: 8px;
+  margin: 20px 0;
+}
+
+.simple-mode-content .about-content {
+  font-size: 1.1em;
+  margin: 20px 0;
+}
+
+.simple-mode-content blockquote {
+  border-left: 3px solid #00ff00;
+  padding-left: 20px;
+  margin: 20px 0;
+  font-style: italic;
+  color: #58a6ff;
+}
+
+.simple-mode-content .posts-section {
+  margin-top: 40px;
+}
+
+.simple-mode-content .post-list {
+  list-style: none;
+  padding: 0;
+}
+
+.simple-mode-content .post-item {
+  margin: 20px 0;
+  padding: 15px;
+  border-left: 3px solid #00ff00;
+  background-color: rgba(0, 255, 0, 0.05);
+}
+
+.simple-mode-content .post-link {
+  color: #58a6ff;
+  text-decoration: none;
+  font-size: 1.2em;
+}
+
+.simple-mode-content .post-link:hover {
+  text-decoration: underline;
+}
+
+.simple-mode-content .post-meta {
+  color: #8b949e;
+  font-size: 0.9em;
+}
+
+/* CRT effect integration - moved from inline styles */
+body.crt {
+  position: relative;
+}
+
+body.crt::before,
+body.crt::after {
+  position: fixed;
+  z-index: 1001;
+}
+
+body.terminal-mode.crt::before,
+body.terminal-mode.crt::after {
+  z-index: 1001 !important;
+}
+
+/* Ensure terminal gets CRT effect */
+.terminal-mode .terminal-container {
+  position: relative;
+}
+
+.terminal-mode .terminal-container::before,
+.terminal-mode .terminal-container::after {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1001;
+  pointer-events: none;
+}
+
+/* Kirby dancing animation */
+.kirby-container {
+  text-align: center;
+  padding: 10px 0;
+  font-family: 'Courier New', monospace;
+  white-space: pre;
+  overflow: visible;
+}
+
+.kirby-dance {
+  display: inline-block;
+  font-size: 1.2em;
+}

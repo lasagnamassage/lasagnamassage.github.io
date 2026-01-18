@@ -8,7 +8,23 @@ source "https://rubygems.org"
 # This will help ensure the proper Jekyll version is running.
 # Happy Jekylling!
 gem "jekyll", "~> 4.2.2"
-gem "logger"  # Required for Ruby 4.0+ (logger was removed from default gems)
+# Required for Ruby 4.0+ (these standard library gems were removed from default gems)
+gem "logger"
+gem "csv"
+gem "base64"
+gem "ostruct"
+gem "cgi"
+gem "rexml"
+gem "rss"
+gem "net-http"
+gem "net-protocol"
+gem "net-smtp"
+gem "stringio"
+gem "io-console"
+gem "readline"
+gem "psych"
+gem "bigdecimal"
+gem "webrick"
 # This is the default theme for new Jekyll sites. You may change this to anything you like.
 gem "minima", "~> 2.5"
 # If you want to use GitHub Pages, remove the "gem "jekyll"" above and

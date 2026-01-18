@@ -2,9 +2,12 @@
 <html lang="{{ page.lang | default: site.lang | default: "en" }}">
 
   {%- include head.html -%}
+  {%- include head-custom.html -%}
 
-  <body class="crt">
-    {%- include header.html -%}
+  <body class="crt {% if page.layout == 'home' %}terminal-mode{% endif %}">
+    {%- unless page.layout == 'home' -%}
+      {%- include header.html -%}
+    {%- endunless -%}
 
     <main class="page-content" aria-label="Content">
       <div class="wrapper">
@@ -12,7 +15,74 @@
       </div>
     </main>
 
-    {%- include footer.html -%}
+    {%- unless page.layout == 'home' -%}
+      {%- include footer.html -%}
+    {%- endunless -%}
+    
+    {%- if page.layout == 'home' -%}
+      <!-- Mode toggle button -->
+      <button class="mode-toggle" id="modeToggle" aria-label="Switch to simple layout">
+        Switch to Simple View
+      </button>
+
+      <!-- Simple mode content -->
+      <div class="simple-mode" id="simpleMode">
+        <div class="simple-mode-content">
+          <h1>{{ site.title }}</h1>
+          
+          <img src="{{ '/assets/me.png' | relative_url }}" alt="Ashaun with various gourds, 2022">
+          <p><em>me with various gourds, 2022</em></p>
+          
+          <div class="about-content">
+            <p>I've rewritten this quite a bit trying to seem as interesting or as professional as possible,
+            but I've since settled on authenticity as my main focus. I'm a software engineer that likes
+            humans as much as I like tech, and I want to be excellent so that I can quell my existential dread, simple as that. The problem statement that I've worked on resolving over my past 5 years in the game was simple:</p>
+            
+            <blockquote>What does excellence look like to me?</blockquote>
+            
+            <p>After some reflection, life experience, and meditation over various quotes from the greatest philosophers of all time (Kanye West and Marcus Aurelius of course), I've decided on some quantifiable goals that I'd like to reach during my time. This blog is basically to aid me in making these things happen. I'd like to get into the habit of creating the things I think are fun, funny, or that would help humanity, and I'd like to get into the habit of progressing daily and releasing whatever I think would be cool.</p>
+          </div>
+
+          {%- if site.posts.size > 0 -%}
+            <div class="posts-section">
+              <h2>Posts</h2>
+              <ul class="post-list">
+                {%- for post in site.posts -%}
+                <li class="post-item">
+                  {%- assign date_format = site.minima.date_format | default: "%b %-d, %Y" -%}
+                  <span class="post-meta">{{ post.date | date: date_format }}</span>
+                  <h3>
+                    <a class="post-link" href="{{ post.url | relative_url }}">
+                      {{ post.title | escape }}
+                    </a>
+                  </h3>
+                  {%- if site.show_excerpts -%}
+                    {{ post.excerpt }}
+                  {%- endif -%}
+                </li>
+                {%- endfor -%}
+              </ul>
+            </div>
+          {%- endif -%}
+        </div>
+      </div>
+
+      <script>
+        // Pass Jekyll post data to JavaScript
+        window.jekyllPosts = [
+          {%- for post in site.posts -%}
+          {
+            title: {{ post.title | jsonify }},
+            slug: {{ post.url | replace: '/', ' ' | split: ' ' | last | jsonify }},
+            date: {{ post.date | date: "%Y-%m-%d" | jsonify }},
+            url: {{ post.url | relative_url | jsonify }},
+            excerpt: {{ post.excerpt | strip_html | strip_newlines | truncatewords: 50 | jsonify }}
+          }{%- unless forloop.last -%},{%- endunless -%}
+          {%- endfor -%}
+        ];
+      </script>
+      <script src="{{ '/assets/js/terminal.js' | relative_url }}"></script>
+    {%- endif -%}
   </body>
 
 </html>
