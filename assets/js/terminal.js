@@ -51,6 +51,7 @@
   let historyIndex = -1;
   let terminalInput;
   let terminalOutput;
+  let terminalCursor;
   let currentCommand = '';
 
   // Initialize terminal
@@ -63,6 +64,7 @@
 
     terminalOutput = container.querySelector('.terminal-output');
     terminalInput = container.querySelector('.terminal-input');
+    terminalCursor = container.querySelector('.cursor');
     
     if (!terminalInput || !terminalOutput) return;
 
@@ -72,6 +74,12 @@
     // Event listeners
     terminalInput.addEventListener('keydown', handleKeyDown);
     terminalInput.addEventListener('input', handleInput);
+    terminalInput.addEventListener('keyup', updateCursorPosition);
+    terminalInput.addEventListener('click', updateCursorPosition);
+    terminalInput.addEventListener('select', updateCursorPosition);
+    
+    // Initial cursor position
+    updateCursorPosition();
 
     // Click on output to focus input
     terminalOutput.addEventListener('click', () => {
@@ -132,6 +140,10 @@
       currentCommand = '';
       terminalInput.value = '';
       historyIndex = -1;
+      updateCursorPosition();
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'Home' || e.key === 'End') {
+      // Update cursor position after arrow key navigation
+      setTimeout(updateCursorPosition, 0);
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
       if (commandHistory.length > 0) {
@@ -142,6 +154,8 @@
         }
         terminalInput.value = commandHistory[historyIndex];
         currentCommand = commandHistory[historyIndex];
+        // Update cursor position after setting value
+        setTimeout(updateCursorPosition, 0);
       }
     } else if (e.key === 'ArrowDown') {
       e.preventDefault();
@@ -150,10 +164,13 @@
           historyIndex++;
           terminalInput.value = commandHistory[historyIndex];
           currentCommand = commandHistory[historyIndex];
+          // Update cursor position after setting value
+          setTimeout(updateCursorPosition, 0);
         } else {
           historyIndex = -1;
           terminalInput.value = '';
           currentCommand = '';
+          setTimeout(updateCursorPosition, 0);
         }
       }
     } else if (e.key === 'Tab') {
@@ -165,6 +182,43 @@
   // Handle input changes
   function handleInput(e) {
     currentCommand = e.target.value;
+    updateCursorPosition();
+  }
+  
+  // Update cursor position based on input text and selection
+  function updateCursorPosition() {
+    if (!terminalInput || !terminalCursor) return;
+    
+    // Create a temporary span to measure text width
+    const tempSpan = document.createElement('span');
+    tempSpan.style.visibility = 'hidden';
+    tempSpan.style.position = 'absolute';
+    tempSpan.style.whiteSpace = 'pre';
+    tempSpan.style.font = window.getComputedStyle(terminalInput).font;
+    tempSpan.style.fontFamily = window.getComputedStyle(terminalInput).fontFamily;
+    tempSpan.style.fontSize = window.getComputedStyle(terminalInput).fontSize;
+    tempSpan.style.fontWeight = window.getComputedStyle(terminalInput).fontWeight;
+    tempSpan.style.letterSpacing = window.getComputedStyle(terminalInput).letterSpacing;
+    
+    // Get text up to cursor position
+    const cursorPos = terminalInput.selectionStart || terminalInput.value.length;
+    const textBeforeCursor = terminalInput.value.substring(0, cursorPos);
+    tempSpan.textContent = textBeforeCursor;
+    
+    // Append to input line to measure
+    const inputLine = terminalInput.closest('.terminal-input-line');
+    if (inputLine) {
+      inputLine.appendChild(tempSpan);
+      const textWidth = tempSpan.offsetWidth;
+      inputLine.removeChild(tempSpan);
+      
+      // Get prompt width
+      const prompt = inputLine.querySelector('.prompt');
+      const promptWidth = prompt ? prompt.offsetWidth + parseInt(window.getComputedStyle(prompt).marginRight) : 0;
+      
+      // Position cursor
+      terminalCursor.style.left = (promptWidth + textWidth) + 'px';
+    }
   }
 
   // Handle tab completion
@@ -180,6 +234,7 @@
       if (matches.length === 1) {
         terminalInput.value = matches[0].name + (parts[0] ? ' ' : '');
         currentCommand = terminalInput.value;
+        updateCursorPosition();
       } else if (matches.length > 1) {
         addOutput('Possible commands: ' + matches.map(m => m.name).join(', '), 'terminal-info');
       }
@@ -207,6 +262,7 @@
       if (matches.length === 1) {
         terminalInput.value = command + ' ' + matches[0].slug;
         currentCommand = terminalInput.value;
+        updateCursorPosition();
       } else if (matches.length > 1) {
         addOutput('Possible posts: ' + matches.map(m => m.slug).join(', '), 'terminal-info');
       }
@@ -735,39 +791,7 @@
             addOutput(`Error loading about page: ${error.message}`, 'terminal-error');
             addOutput('Ashaun', 'terminal-success');
             addOutput('Software engineer, blogger, Muay Thai enthusiast', 'terminal-info');
-            addOutput('Type "about" for more information.', 'terminal-info');
           });
-      }
-    },
-    {
-      name: 'about',
-      description: 'Show detailed about information',
-      execute: () => {
-        addOutput('=== About ===', 'terminal-section-title');
-        addOutput('');
-        addOutput('I\'ve rewritten this quite a bit trying to seem as interesting or as');
-        addOutput('professional as possible, but I\'ve since settled on authenticity as');
-        addOutput('my main focus. I\'m a software engineer that likes humans as much as');
-        addOutput('I like tech, and I want to be excellent so that I can quell my');
-        addOutput('existential dread, simple as that.');
-        addOutput('');
-        addOutput('The problem statement that I\'ve worked on resolving over my past 5');
-        addOutput('years in the game was simple:', 'terminal-info');
-        addOutput('');
-        addOutput('  What does excellence look like to me?', 'terminal-success');
-        addOutput('');
-        addOutput('After some reflection, life experience, and meditation over various');
-        addOutput('quotes from the greatest philosophers of all time (Kanye West and');
-        addOutput('Marcus Aurelius of course), I\'ve decided on some quantifiable goals');
-        addOutput('that I\'d like to reach during my time.');
-        addOutput('');
-        addOutput('This blog is basically to aid me in making these things happen.');
-        addOutput('I\'d like to get into the habit of creating the things I think are');
-        addOutput('fun, funny, or that would help humanity, and I\'d like to get into');
-        addOutput('the habit of progressing daily and releasing whatever I think would');
-        addOutput('be cool.');
-        addOutput('');
-        addOutput('Visit /about/ for the full about page with image.', 'terminal-info');
       }
     },
     {
