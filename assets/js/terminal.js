@@ -215,8 +215,8 @@
 
   // Execute command
   function executeCommand(input) {
-    if (!input) {
-      addPrompt('');
+    if (!input || !input.trim()) {
+      // Don't add anything when input is empty
       return;
     }
 
@@ -284,6 +284,11 @@
 
     // If we found a specific content area, use it; otherwise use the whole div
     const contentEl = content === tempDiv ? content : content;
+    
+    // #region agent log
+    const imagesInHTML = tempDiv.querySelectorAll('img');
+    fetch('http://127.0.0.1:7242/ingest/4e55f62b-0624-4ebe-950c-e34572a11236',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'terminal.js:286',message:'Finding content element',data:{foundSelector:content!==tempDiv,imageCount:imagesInHTML.length,contentTagName:contentEl.tagName,imageSrcs:Array.from(imagesInHTML).map(img=>img.getAttribute('src'))},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+    // #endregion
 
     return convertElementToTerminalText(contentEl, baseUrl);
   }
@@ -305,6 +310,9 @@
         if (tagName === 'img') {
           const alt = node.getAttribute('alt') || 'Image';
           let src = node.getAttribute('src') || '';
+          // #region agent log
+          fetch('http://127.0.0.1:7242/ingest/4e55f62b-0624-4ebe-950c-e34572a11236',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'terminal.js:305',message:'Image node found',data:{originalSrc:src,alt:alt,baseUrl:baseUrl},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+          // #endregion
           // Convert relative URLs to absolute
           if (src && !src.startsWith('http://') && !src.startsWith('https://') && !src.startsWith('//')) {
             if (baseUrl) {
@@ -326,6 +334,9 @@
               }
             }
           }
+          // #region agent log
+          fetch('http://127.0.0.1:7242/ingest/4e55f62b-0624-4ebe-950c-e34572a11236',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'terminal.js:329',message:'Image parsed with resolved src',data:{resolvedSrc:src,alt:alt},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+          // #endregion
           result.push({ type: 'image', alt, src });
         }
         // Handle headings
@@ -356,11 +367,17 @@
         else if (tagName === 'br') {
           result.push({ type: 'linebreak' });
         }
-        // Handle paragraphs
+        // Handle paragraphs - recursively process children to find images, links, etc.
         else if (tagName === 'p') {
-          const text = node.textContent.trim();
-          if (text) {
-            result.push({ type: 'paragraph', content: text });
+          const nested = convertElementToTerminalText(node, baseUrl);
+          if (nested.length > 0) {
+            result.push(...nested);
+          } else {
+            // If no nested content found, just use text as fallback
+            const text = node.textContent.trim();
+            if (text) {
+              result.push({ type: 'paragraph', content: text });
+            }
           }
         }
         // Handle links
@@ -404,6 +421,9 @@
 
   // Render terminal-friendly content to the terminal
   function renderTerminalContent(content) {
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/4e55f62b-0624-4ebe-950c-e34572a11236',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'terminal.js:407',message:'renderTerminalContent called',data:{contentLength:content.length,hasImages:content.some(c=>c.type==='image'),imageItems:content.filter(c=>c.type==='image').map(i=>({src:i.src,alt:i.alt}))},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+    // #endregion
     for (const item of content) {
       switch (item.type) {
         case 'text':
@@ -446,20 +466,53 @@
           addOutput('─'.repeat(60), 'terminal-info');
           break;
         case 'image':
+          // #region agent log
+          fetch('http://127.0.0.1:7242/ingest/4e55f62b-0624-4ebe-950c-e34572a11236',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'terminal.js:449',message:'Image case hit in renderTerminalContent',data:{itemSrc:item.src,itemAlt:item.alt},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+          // #endregion
           const imageLine = document.createElement('div');
-          imageLine.className = 'terminal-line terminal-output-text';
-          const imageText = `[Image: ${item.alt}]`;
-          imageLine.appendChild(document.createTextNode(imageText));
+          imageLine.className = 'terminal-line terminal-image-container';
           if (item.src) {
-            const link = document.createElement('a');
-            link.href = item.src;
-            link.className = 'terminal-post-link';
-            link.textContent = ' (View)';
-            link.target = '_blank';
-            link.rel = 'noopener noreferrer';
-            imageLine.appendChild(link);
+            const img = document.createElement('img');
+            img.src = item.src;
+            img.alt = item.alt || 'Image';
+            img.className = 'terminal-image';
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/4e55f62b-0624-4ebe-950c-e34572a11236',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'terminal.js:456',message:'Image element created',data:{imgSrc:img.src,imgAlt:img.alt,imgClassName:img.className},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+            // #endregion
+            img.onerror = function() {
+              // #region agent log
+              fetch('http://127.0.0.1:7242/ingest/4e55f62b-0624-4ebe-950c-e34572a11236',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'terminal.js:457',message:'Image onerror fired',data:{failedSrc:img.src},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+              // #endregion
+              // Fallback to text if image fails to load
+              imageLine.innerHTML = '';
+              imageLine.className = 'terminal-line terminal-output-text';
+              const imageText = `[Image: ${item.alt || 'Image'}]`;
+              imageLine.appendChild(document.createTextNode(imageText));
+              const link = document.createElement('a');
+              link.href = item.src;
+              link.className = 'terminal-post-link';
+              link.textContent = ' (View)';
+              link.target = '_blank';
+              link.rel = 'noopener noreferrer';
+              imageLine.appendChild(link);
+            };
+            imageLine.appendChild(img);
+            if (item.alt) {
+              const altText = document.createElement('div');
+              altText.className = 'terminal-image-alt';
+              altText.textContent = item.alt;
+              imageLine.appendChild(altText);
+            }
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/4e55f62b-0624-4ebe-950c-e34572a11236',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'terminal.js:470',message:'Image element appended to imageLine',data:{imageLineClassName:imageLine.className,imageLineChildrenCount:imageLine.children.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+            // #endregion
+          } else {
+            imageLine.textContent = `[Image: ${item.alt || 'Image'}]`;
           }
           terminalOutput.appendChild(imageLine);
+          // #region agent log
+          fetch('http://127.0.0.1:7242/ingest/4e55f62b-0624-4ebe-950c-e34572a11236',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'terminal.js:480',message:'imageLine appended to terminalOutput',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+          // #endregion
           scrollToBottom();
           break;
         case 'link':
@@ -643,9 +696,47 @@
       name: 'whoami',
       description: 'Show information about the author',
       execute: () => {
-        addOutput('Ashaun', 'terminal-success');
-        addOutput('Software engineer, blogger, Muay Thai enthusiast', 'terminal-info');
-        addOutput('Type "about" for more information.', 'terminal-info');
+        addOutput('Loading about information...', 'terminal-info');
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/4e55f62b-0624-4ebe-950c-e34572a11236',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'terminal.js:663',message:'whoami execute called',data:{timestamp:Date.now()},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+        // #endregion
+        fetch('/about/')
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Failed to fetch about page');
+            }
+            return response.text();
+          })
+          .then(html => {
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/4e55f62b-0624-4ebe-950c-e34572a11236',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'terminal.js:672',message:'About page HTML received',data:{htmlLength:html.length,htmlPreview:html.substring(0,200)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+            // #endregion
+            // Remove the loading message
+            const lastLine = terminalOutput.lastElementChild;
+            if (lastLine && lastLine.textContent.includes('Loading about information...')) {
+              terminalOutput.removeChild(lastLine);
+            }
+            
+            // Parse and display content
+            const terminalContent = convertHTMLToTerminalText(html, '/about/');
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/4e55f62b-0624-4ebe-950c-e34572a11236',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'terminal.js:680',message:'Terminal content parsed',data:{contentLength:terminalContent.length,contentTypes:terminalContent.map(c=>c.type)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+            // #endregion
+            renderTerminalContent(terminalContent);
+          })
+          .catch(error => {
+            // Remove the loading message
+            const lastLine = terminalOutput.lastElementChild;
+            if (lastLine && lastLine.textContent.includes('Loading about information...')) {
+              terminalOutput.removeChild(lastLine);
+            }
+            
+            // Fallback message
+            addOutput(`Error loading about page: ${error.message}`, 'terminal-error');
+            addOutput('Ashaun', 'terminal-success');
+            addOutput('Software engineer, blogger, Muay Thai enthusiast', 'terminal-info');
+            addOutput('Type "about" for more information.', 'terminal-info');
+          });
       }
     },
     {
