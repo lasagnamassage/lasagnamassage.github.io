@@ -1,3 +1,13 @@
+/* Prevent horizontal overflow */
+html, body {
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
 /* Terminal Styles */
 .terminal-container {
   font-family: 'Courier New', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
@@ -7,7 +17,7 @@
   padding: 20px;
   border-radius: 0;
   max-width: 100%;
-  width: 100vw;
+  width: 100%;
   height: 100vh;
   min-height: 100vh;
   display: flex;
@@ -18,6 +28,7 @@
   left: 0;
   z-index: 1000;
   margin: 0;
+  box-sizing: border-box;
 }
 
 .terminal-output {
@@ -88,25 +99,30 @@
   font-family: inherit;
   font-size: inherit;
   outline: none;
-  caret-color: #00ff00;
+  caret-color: transparent;
 }
 
 .terminal-input:focus {
   outline: none;
 }
 
-.terminal-input:focus + .cursor {
+.terminal-input:focus ~ .cursor,
+.terminal-input-line:focus-within .cursor {
   opacity: 1;
 }
 
 .cursor {
+  position: absolute;
   display: inline-block;
   width: 8px;
   height: 1.2em;
   background-color: #00ff00;
-  margin-left: 2px;
+  top: 50%;
+  transform: translateY(-50%);
   animation: blink 1s infinite;
-  vertical-align: middle;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.1s;
 }
 
 @keyframes blink {
@@ -237,19 +253,43 @@
 }
 
 /* Responsive design */
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .terminal-container {
+    font-size: 1.3em;
+    padding: 18px;
+  }
+  
+  .simple-mode-content {
+    padding: 30px 20px;
+  }
+  
+  .simple-mode-content h1 {
+    font-size: 2.2em;
+  }
+  
+  .simple-mode-content h2 {
+    font-size: 1.8em;
+  }
+  
+  .mode-toggle {
+    top: 15px;
+    right: 15px;
+    padding: 9px 18px;
+    font-size: 13px;
+  }
+}
+
+/* Mobile */
 @media (max-width: 768px) {
   .terminal-container {
-    padding: 15px;
-    font-size: 14px;
+    padding: 12px;
+    font-size: 1.1em;
   }
   
   .terminal-help-command {
     min-width: 120px;
-  }
-  
-  .terminal-container {
-    padding: 15px;
-    font-size: 14px;
   }
   
   .mode-toggle {
@@ -261,6 +301,91 @@
   
   .terminal-output {
     max-height: calc(100vh - 120px);
+    padding-bottom: 8px;
+  }
+  
+  .terminal-line {
+    margin: 4px 0;
+    line-height: 1.5;
+  }
+  
+  .simple-mode-content {
+    padding: 25px 15px;
+  }
+  
+  .simple-mode-content h1 {
+    font-size: 1.8em;
+    margin-bottom: 15px;
+  }
+  
+  .simple-mode-content h2 {
+    font-size: 1.5em;
+    margin-top: 30px;
+    margin-bottom: 15px;
+  }
+  
+  .simple-mode-content img {
+    max-width: 100%;
+  }
+  
+  .terminal-image {
+    max-height: 300px;
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+  .terminal-container {
+    padding: 10px;
+    font-size: 0.95em;
+  }
+  
+  .terminal-input-line {
+    margin-top: 8px;
+  }
+  
+  .mode-toggle {
+    top: 8px;
+    right: 8px;
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+  
+  .terminal-output {
+    max-height: calc(100vh - 100px);
+    padding-bottom: 6px;
+  }
+  
+  .terminal-line {
+    margin: 3px 0;
+    line-height: 1.4;
+  }
+  
+  .simple-mode-content {
+    padding: 20px 12px;
+  }
+  
+  .simple-mode-content h1 {
+    font-size: 1.5em;
+    margin-bottom: 12px;
+  }
+  
+  .simple-mode-content h2 {
+    font-size: 1.3em;
+    margin-top: 25px;
+    margin-bottom: 12px;
+  }
+  
+  .simple-mode-content .about-content {
+    font-size: 1em;
+  }
+  
+  .terminal-image {
+    max-height: 250px;
+  }
+  
+  .terminal-help-command {
+    min-width: 100px;
   }
 }
 
@@ -304,10 +429,11 @@
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
+  width: 100%;
   height: 100vh;
   z-index: 1001;
   pointer-events: none;
+  box-sizing: border-box;
 }
 
 /* Mode toggle button */
@@ -388,6 +514,7 @@ body.simple-mode main {
 
 body.terminal-mode {
   overflow-y: hidden;
+  overflow-x: hidden;
 }
 
 .terminal-mode .page-content {
@@ -510,10 +637,12 @@ body.terminal-mode.crt::after {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
+  width: 100%;
   height: 100vh;
   overflow-y: auto;
+  overflow-x: hidden;
   z-index: 9999;
+  box-sizing: border-box;
 }
 
 /* Show simple-mode when active OR when body has simple-mode class */
@@ -527,10 +656,80 @@ body.simple-mode,
 body.simple-mode html {
   background-color: #0d1117 !important;
   overflow: hidden;
+  overflow-x: hidden;
 }
 
 body.simple-mode .page-content {
   background-color: #0d1117;
+}
+
+/* Post page styling - apply dark theme and CRT effect */
+body.crt:not(.terminal-mode) .page-content,
+body.crt:not(.terminal-mode) .wrapper {
+  background-color: #0d1117;
+  color: #c9d1d9;
+}
+
+body.crt:not(.terminal-mode) .page-content {
+  padding: 40px 20px;
+}
+
+body.crt:not(.terminal-mode) .wrapper {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+/* Post content styling */
+body.crt:not(.terminal-mode) article,
+body.crt:not(.terminal-mode) .post-content {
+  color: #c9d1d9;
+  line-height: 1.8;
+}
+
+body.crt:not(.terminal-mode) h1,
+body.crt:not(.terminal-mode) h2,
+body.crt:not(.terminal-mode) h3,
+body.crt:not(.terminal-mode) h4,
+body.crt:not(.terminal-mode) h5,
+body.crt:not(.terminal-mode) h6 {
+  color: #00ff00;
+}
+
+body.crt:not(.terminal-mode) a {
+  color: #58a6ff;
+}
+
+body.crt:not(.terminal-mode) a:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+body.crt:not(.terminal-mode) blockquote {
+  border-left: 3px solid #00ff00;
+  padding-left: 20px;
+  margin: 20px 0;
+  font-style: italic;
+  color: #58a6ff;
+}
+
+body.crt:not(.terminal-mode) code {
+  color: #00ff88;
+  background-color: rgba(0, 255, 136, 0.1);
+  padding: 2px 4px;
+  border-radius: 2px;
+}
+
+body.crt:not(.terminal-mode) pre {
+  background-color: rgba(0, 255, 136, 0.1);
+  padding: 15px;
+  border-radius: 4px;
+  overflow-x: auto;
+}
+
+body.crt:not(.terminal-mode) pre code {
+  background-color: transparent;
+  padding: 0;
 }
 
 .simple-mode-content {
@@ -630,10 +829,11 @@ body.terminal-mode.crt::after {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
+  width: 100%;
   height: 100vh;
   z-index: 1001;
   pointer-events: none;
+  box-sizing: border-box;
 }
 
 /* Kirby dancing animation */
