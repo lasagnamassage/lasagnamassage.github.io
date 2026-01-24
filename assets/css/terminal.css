@@ -11,7 +11,7 @@ html, body {
 /* Terminal Styles */
 .terminal-container {
   font-family: 'Courier New', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-  font-size: 1.56em;
+  font-size: 2.34em;
   background-color: #0d1117;
   color: #00ff00;
   padding: 20px;
@@ -34,9 +34,44 @@ html, body {
 .terminal-output {
   flex: 1;
   overflow-y: auto;
-  padding-bottom: 10px;
+  padding-bottom: 80px;
   max-height: calc(100vh - 100px);
   scroll-behavior: smooth;
+  display: flex;
+  flex-direction: column;
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  position: relative;
+}
+
+/* Reading progress bar */
+.terminal-reading-progress {
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  min-height: 3px;
+  flex-shrink: 0;
+  background-color: rgba(0, 255, 0, 0.2);
+  z-index: 99;
+  margin: 0;
+  padding: 0;
+}
+
+/* When progress bar comes after title, it appears below the title in normal flow,
+   then becomes sticky when it reaches the top (after title scrolls past) */
+.terminal-title-sticky + .terminal-reading-progress {
+  /* Keep sticky but will appear below title initially */
+}
+
+.terminal-reading-progress-bar {
+  height: 100%;
+  background-color: #00ff00;
+  width: 0%;
+  transition: width 0.1s ease;
 }
 
 .terminal-output::-webkit-scrollbar {
@@ -56,18 +91,34 @@ html, body {
   background: #484f58;
 }
 
+/* Hide native scrollbar when progress bar is active */
+.terminal-output.has-progress-bar::-webkit-scrollbar {
+  width: 0;
+  display: none;
+}
+
+.terminal-output.has-progress-bar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
 .terminal-line {
-  margin: 5px 0;
-  line-height: 1.6;
+  margin: 8px 0;
+  letter-spacing: 0.02em;
+  line-height: 1.8;
   word-wrap: break-word;
   white-space: pre-wrap;
   overflow: visible;
   min-height: 1.6em;
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
 }
 
 /* Allow zalgo text to display fully */
 .terminal-line .terminal-info {
-  line-height: 2;
+  line-height: 1.8;
   overflow: visible;
 }
 
@@ -81,7 +132,11 @@ html, body {
   display: flex;
   align-items: center;
   margin-top: 10px;
-  position: relative;
+  position: sticky;
+  bottom: 0;
+  background-color: #0d1117;
+  padding: 10px 0;
+  z-index: 10;
 }
 
 .terminal-input-line .prompt {
@@ -139,8 +194,11 @@ html, body {
   color: #00ff00;
 }
 
-.terminal-output-text {
+.terminal-line.terminal-output-text {
   color: #c9d1d9;
+  margin: 0.8em 0;
+  line-height: 1.4;
+  min-height: auto;
 }
 
 .terminal-error {
@@ -163,10 +221,11 @@ html, body {
   color: #00ff88;
   font-family: 'Courier New', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
   background-color: rgba(0, 255, 136, 0.1);
-  padding: 2px 4px;
+  padding: 4px 6px;
   border-radius: 2px;
+  margin: 0.5em 0;
+  line-height: 1.6;
 }
-
 /* Help command styling */
 .terminal-help {
   margin: 10px 0;
@@ -174,7 +233,7 @@ html, body {
 
 .terminal-help-item {
   display: flex;
-  margin: 5px 0;
+  margin: 8px 0;
   padding-left: 20px;
 }
 
@@ -182,6 +241,7 @@ html, body {
   color: #00ff00;
   min-width: 150px;
   font-weight: bold;
+  white-space: nowrap;
 }
 
 .terminal-help-description {
@@ -220,6 +280,9 @@ html, body {
 .terminal-image-container {
   margin: 15px 0;
   text-align: left;
+  align-self: flex-start;
+  min-height: 0;
+  flex-shrink: 0;
 }
 
 .terminal-image {
@@ -234,7 +297,7 @@ html, body {
 
 .terminal-image-alt {
   color: #8b949e;
-  font-size: 0.9em;
+  font-size: 1.35em;
   font-style: italic;
   margin-top: 5px;
   text-align: left;
@@ -249,7 +312,71 @@ html, body {
 .terminal-section-title {
   color: #00ff00;
   font-weight: bold;
-  margin-bottom: 5px;
+  margin: 0.6em 0 0.2em 0;
+  display: flex;
+  align-items: center;
+}
+
+.terminal-back-arrow {
+  color: #00ff00;
+  margin-right: 0.5em;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  font-size: 1.2em;
+  transition: opacity 0.2s, transform 0.2s;
+  display: inline-block;
+  padding: 0 0.2em;
+}
+
+.terminal-back-arrow:hover {
+  opacity: 0.8;
+  transform: translateX(-2px);
+}
+
+.terminal-back-arrow:active {
+  opacity: 0.6;
+  transform: translateX(-4px);
+}
+
+.terminal-back-arrow:focus {
+  outline: 2px solid #00ff00;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.terminal-back-arrow-absolute {
+  position: absolute;
+  left: 0;
+  top: 0.6em;
+  margin-right: 0;
+  z-index: 101;
+}
+
+.terminal-section-title-ascii {
+  display: block !important;
+  padding-left: 1.5em;
+  margin: 1px 0;
+  line-height: 1.2;
+  min-height: auto;
+  font-size: 0.9em;
+}
+
+.terminal-section-title-text {
+  flex: 1;
+}
+
+/* Sticky title for terminal post view */
+.terminal-title-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: #0d1117;
+  padding: 3px 0;
+  margin-bottom: 3px;
+  text-align: center;
 }
 
 /* Responsive design */
@@ -257,7 +384,7 @@ html, body {
 /* Tablet */
 @media (max-width: 1024px) {
   .terminal-container {
-    font-size: 1.3em;
+    font-size: 1.95em;
     padding: 18px;
   }
   
@@ -266,18 +393,19 @@ html, body {
   }
   
   .simple-mode-content h1 {
-    font-size: 2.2em;
+    font-size: 3.3em;
   }
   
   .simple-mode-content h2 {
-    font-size: 1.8em;
+    font-size: 2.7em;
   }
   
-  .mode-toggle {
+  .mode-toggle-fixed,
+  .mode-toggle-in-nav {
     top: 15px;
     right: 15px;
     padding: 9px 18px;
-    font-size: 13px;
+    font-size: 19.5px;
   }
 }
 
@@ -285,23 +413,24 @@ html, body {
 @media (max-width: 768px) {
   .terminal-container {
     padding: 12px;
-    font-size: 1.1em;
+    font-size: 1.65em;
   }
   
   .terminal-help-command {
     min-width: 120px;
   }
   
-  .mode-toggle {
+  .mode-toggle-fixed,
+  .mode-toggle-in-nav {
     top: 10px;
     right: 10px;
     padding: 8px 16px;
-    font-size: 12px;
+    font-size: 18px;
   }
   
   .terminal-output {
     max-height: calc(100vh - 120px);
-    padding-bottom: 8px;
+    padding-bottom: 80px;
   }
   
   .terminal-line {
@@ -309,17 +438,72 @@ html, body {
     line-height: 1.5;
   }
   
+  /* Center help text and subtitle on desktop */
+  .help-text-mobile-center {
+    text-align: center;
+    width: 100%;
+  }
+  
+  /* Center help text on all screen sizes */
+  .help-text-mobile-center,
+  .terminal-line.terminal-info.help-text-mobile-center {
+    text-align: center !important;
+    width: 100%;
+  }
+  
+  .subtitle-centered {
+    text-align: center;
+    width: 100%;
+  }
+  
+  .help-text-wrapper {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+  }
+  
+  /* Center welcome message elements on mobile */
+  .terminal-output .terminal-line.terminal-info:first-child {
+    text-align: center;
+    width: 100%;
+  }
+  
+  .terminal-line.terminal-info.kirby-container {
+    text-align: center;
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .terminal-line.terminal-info:last-child:contains("Type 'help'") {
+    text-align: center;
+    width: 100%;
+  }
+  
+  /* Center help text specifically */
+  .terminal-output .terminal-line.terminal-info:nth-child(3),
+  .terminal-line.terminal-info.help-text-mobile-center {
+    text-align: center;
+    width: 100%;
+  }
+  
+  .help-text-mobile-center {
+    text-align: center;
+    width: 100%;
+  }
+  
   .simple-mode-content {
     padding: 25px 15px;
   }
   
   .simple-mode-content h1 {
-    font-size: 1.8em;
+    font-size: 2.7em;
     margin-bottom: 15px;
   }
   
   .simple-mode-content h2 {
-    font-size: 1.5em;
+    font-size: 2.25em;
     margin-top: 30px;
     margin-bottom: 15px;
   }
@@ -337,23 +521,24 @@ html, body {
 @media (max-width: 480px) {
   .terminal-container {
     padding: 10px;
-    font-size: 0.95em;
+    font-size: 1.425em;
   }
   
   .terminal-input-line {
     margin-top: 8px;
   }
   
-  .mode-toggle {
+  .mode-toggle-fixed,
+  .mode-toggle-in-nav {
     top: 8px;
     right: 8px;
     padding: 6px 12px;
-    font-size: 11px;
+    font-size: 16.5px;
   }
   
   .terminal-output {
     max-height: calc(100vh - 100px);
-    padding-bottom: 6px;
+    padding-bottom: 80px;
   }
   
   .terminal-line {
@@ -366,18 +551,18 @@ html, body {
   }
   
   .simple-mode-content h1 {
-    font-size: 1.5em;
+    font-size: 2.25em;
     margin-bottom: 12px;
   }
   
   .simple-mode-content h2 {
-    font-size: 1.3em;
+    font-size: 1.95em;
     margin-top: 25px;
     margin-bottom: 12px;
   }
   
   .simple-mode-content .about-content {
-    font-size: 1em;
+    font-size: 1.5em;
   }
   
   .terminal-image {
@@ -436,35 +621,74 @@ html, body {
   box-sizing: border-box;
 }
 
-/* Mode toggle button */
-.mode-toggle {
+/* Mode toggle button - same dimensions and position for both modes */
+.mode-toggle-fixed,
+.mode-toggle-in-nav {
   position: fixed;
   top: 20px;
   right: 20px;
-  z-index: 10000;
+  z-index: 100001;
   padding: 10px 20px;
-  background-color: rgba(0, 255, 0, 0.1);
-  border: 1px solid #00ff00;
+  background-color: #0d1117;
+  border: 1px solid rgba(0, 255, 0, 0.85);
   color: #00ff00;
   font-family: 'Courier New', monospace;
   cursor: pointer;
   border-radius: 4px;
-  font-size: 14px;
+  font-size: 21px;
   transition: all 0.3s ease;
+  margin: 0;
+  box-sizing: border-box;
+  min-width: 340px;
+  text-align: center;
+  white-space: nowrap;
 }
 
-/* Ensure button is visible in simple mode */
-body.simple-mode .mode-toggle,
-.simple-mode.active ~ .mode-toggle {
-  z-index: 10000;
+/* Nav item for mode toggle - position relative for absolute positioning */
+.mode-toggle-nav-item {
+  position: relative;
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Hide nav button in terminal mode, show fixed button */
+body.terminal-mode .mode-toggle-in-nav,
+body.terminal-mode .mode-toggle-nav-item {
+  display: none !important;
+}
+
+body.terminal-mode .mode-toggle-fixed {
   display: block !important;
+  visibility: visible !important;
+  z-index: 100001;
 }
 
-.mode-toggle:hover {
-  background-color: rgba(0, 255, 0, 0.2);
+/* Hide fixed button in simple mode, show nav button */
+body.simple-mode .mode-toggle-fixed {
+  display: none !important;
 }
 
-.mode-toggle:focus {
+body.simple-mode .mode-toggle-in-nav,
+body.simple-mode .mode-toggle-nav-item {
+  display: block !important;
+  visibility: visible !important;
+}
+
+/* Always visible in all modes - terminal mode, simple mode, and post views */
+.mode-toggle-fixed {
+  display: block !important;
+  visibility: visible !important;
+  z-index: 100001;
+}
+
+.mode-toggle-fixed:hover,
+.mode-toggle-in-nav:hover {
+  background-color: rgba(13, 17, 23, 0.8);
+}
+
+.mode-toggle-fixed:focus,
+.mode-toggle-in-nav:focus {
   outline: 2px solid #58a6ff;
   outline-offset: 2px;
 }
@@ -633,7 +857,7 @@ body.terminal-mode.crt::after {
 .simple-mode {
   min-height: 100vh;
   background-color: #0d1117;
-  padding: 20px 0;
+  padding: 0;
   position: fixed;
   top: 0;
   left: 0;
@@ -680,6 +904,52 @@ body.crt:not(.terminal-mode) .wrapper {
   padding: 0;
 }
 
+/* Blog post header - full width viewport */
+body.crt:not(.terminal-mode) .site-header {
+  width: 100% !important;
+  display: block;
+  background-color: #0d1117 !important;
+  padding: 20px 0;
+  min-height: 60px;
+}
+
+body.crt:not(.terminal-mode) .site-header .wrapper {
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+  background-color: #0d1117 !important;
+  position: relative;
+}
+
+/* Blog post nav styling - ensure list structure works */
+body.crt:not(.terminal-mode) .site-nav .trigger {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+body.crt:not(.terminal-mode) .site-nav .trigger li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Blog post footer - match terminal background */
+body.crt:not(.terminal-mode) .site-footer {
+  background-color: #0d1117 !important;
+}
+
+body.crt:not(.terminal-mode) .site-footer .wrapper {
+  background-color: #0d1117 !important;
+}
+
 /* Post content styling */
 body.crt:not(.terminal-mode) article,
 body.crt:not(.terminal-mode) .post-content {
@@ -716,8 +986,10 @@ body.crt:not(.terminal-mode) blockquote {
 body.crt:not(.terminal-mode) code {
   color: #00ff88;
   background-color: rgba(0, 255, 136, 0.1);
-  padding: 2px 4px;
+  padding: 4px 6px;
   border-radius: 2px;
+  margin: 0.5em 0;
+  line-height: 1.6;
 }
 
 body.crt:not(.terminal-mode) pre {
@@ -732,22 +1004,326 @@ body.crt:not(.terminal-mode) pre code {
   padding: 0;
 }
 
+/* Markdown wrapper base styles - readable typography for blog posts */
+body.crt:not(.terminal-mode) .markdown-wrapper {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 18px;
+  line-height: 1.7;
+  max-width: 680px;
+  margin: 0 auto;
+  letter-spacing: 0.01em;
+  color: #c9d1d9;
+}
+
+/* Post header styling */
+body.crt:not(.terminal-mode) .post-header {
+  margin-bottom: 2em;
+  padding-bottom: 1em;
+  border-bottom: 1px solid rgba(0, 255, 0, 0.2);
+}
+
+body.crt:not(.terminal-mode) .post-title {
+  font-size: 2.5em;
+  margin: 0 0 0.5em 0;
+  color: #00ff00;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+body.crt:not(.terminal-mode) .post-meta {
+  color: #8b949e;
+  font-size: 0.9em;
+  margin: 0;
+}
+
+body.crt:not(.terminal-mode) .post-meta time {
+  color: #8b949e;
+}
+
+/* Paragraph styling */
+body.crt:not(.terminal-mode) .markdown-wrapper p {
+  margin: 1.2em 0;
+  font-weight: 400;
+  color: #c9d1d9;
+}
+
+/* Heading hierarchy */
+body.crt:not(.terminal-mode) .markdown-wrapper h1 {
+  font-size: 2.5em;
+  margin: 1.5em 0 0.8em 0;
+  color: #00ff00;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+body.crt:not(.terminal-mode) .markdown-wrapper h2 {
+  font-size: 2em;
+  margin: 1.3em 0 0.7em 0;
+  color: #00ff00;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+body.crt:not(.terminal-mode) .markdown-wrapper h3 {
+  font-size: 1.5em;
+  margin: 1.1em 0 0.6em 0;
+  color: #00ff00;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+body.crt:not(.terminal-mode) .markdown-wrapper h4 {
+  font-size: 1.25em;
+  margin: 1em 0 0.5em 0;
+  color: #00ff00;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+body.crt:not(.terminal-mode) .markdown-wrapper h5 {
+  font-size: 1.1em;
+  margin: 0.9em 0 0.5em 0;
+  color: #00ff00;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+body.crt:not(.terminal-mode) .markdown-wrapper h6 {
+  font-size: 1em;
+  margin: 0.8em 0 0.5em 0;
+  color: #00ff00;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+/* List styling */
+body.crt:not(.terminal-mode) .markdown-wrapper ul,
+body.crt:not(.terminal-mode) .markdown-wrapper ol {
+  margin: 1.2em 0;
+  padding-left: 2em;
+}
+
+body.crt:not(.terminal-mode) .markdown-wrapper ul {
+  list-style-type: disc;
+}
+
+body.crt:not(.terminal-mode) .markdown-wrapper ol {
+  list-style-type: decimal;
+}
+
+body.crt:not(.terminal-mode) .markdown-wrapper li {
+  margin: 0.5em 0;
+  line-height: 1.7;
+  color: #c9d1d9;
+}
+
+body.crt:not(.terminal-mode) .markdown-wrapper ul ul,
+body.crt:not(.terminal-mode) .markdown-wrapper ol ol,
+body.crt:not(.terminal-mode) .markdown-wrapper ul ol,
+body.crt:not(.terminal-mode) .markdown-wrapper ol ul {
+  margin: 0.5em 0;
+  padding-left: 1.5em;
+}
+
+body.crt:not(.terminal-mode) .markdown-wrapper ul ul {
+  list-style-type: circle;
+}
+
+body.crt:not(.terminal-mode) .markdown-wrapper ul ul ul {
+  list-style-type: square;
+}
+
+/* Enhanced code block styling */
+body.crt:not(.terminal-mode) .markdown-wrapper pre {
+  background-color: rgba(0, 255, 136, 0.15);
+  padding: 20px;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin: 1.5em 0;
+  border: 1px solid rgba(0, 255, 136, 0.2);
+}
+
+body.crt:not(.terminal-mode) .markdown-wrapper pre code {
+  font-family: 'Courier New', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.9em;
+  line-height: 1.6;
+  color: #00ff88;
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+}
+
+/* Inline code keeps existing styling but ensures monospace */
+body.crt:not(.terminal-mode) .markdown-wrapper code:not(pre code) {
+  font-family: 'Courier New', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+/* Image styling */
+body.crt:not(.terminal-mode) .markdown-wrapper img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+  margin: 1.5em 0;
+  display: block;
+  box-shadow: 0 2px 8px rgba(0, 255, 0, 0.1);
+}
+
+/* Table styling */
+body.crt:not(.terminal-mode) .markdown-wrapper table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5em 0;
+  font-size: 0.95em;
+}
+
+body.crt:not(.terminal-mode) .markdown-wrapper th {
+  background-color: rgba(0, 255, 0, 0.1);
+  color: #00ff00;
+  font-weight: 600;
+  padding: 12px;
+  text-align: left;
+  border: 1px solid rgba(0, 255, 0, 0.2);
+}
+
+body.crt:not(.terminal-mode) .markdown-wrapper td {
+  padding: 12px;
+  border: 1px solid rgba(0, 255, 0, 0.1);
+  color: #c9d1d9;
+}
+
+body.crt:not(.terminal-mode) .markdown-wrapper tr:nth-child(even) {
+  background-color: rgba(0, 255, 0, 0.05);
+}
+
+/* Horizontal rules */
+body.crt:not(.terminal-mode) .markdown-wrapper hr {
+  border: none;
+  border-top: 2px solid rgba(0, 255, 0, 0.3);
+  margin: 2em 0;
+  background: none;
+}
+
+/* Emphasis styling */
+body.crt:not(.terminal-mode) .markdown-wrapper strong,
+body.crt:not(.terminal-mode) .markdown-wrapper b {
+  font-weight: 600;
+  color: #ffffff;
+}
+
+body.crt:not(.terminal-mode) .markdown-wrapper em,
+body.crt:not(.terminal-mode) .markdown-wrapper i {
+  font-style: italic;
+}
+
+/* Link styling (enhance existing) */
+body.crt:not(.terminal-mode) .markdown-wrapper a {
+  color: #58a6ff;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+body.crt:not(.terminal-mode) .markdown-wrapper a:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+/* Blockquote styling (enhance existing) */
+body.crt:not(.terminal-mode) .markdown-wrapper blockquote {
+  border-left: 3px solid #00ff00;
+  padding-left: 20px;
+  margin: 1.5em 0;
+  font-style: italic;
+  color: #58a6ff;
+  background-color: rgba(0, 255, 0, 0.05);
+  padding: 15px 20px;
+  border-radius: 4px;
+}
+
+body.crt:not(.terminal-mode) .markdown-wrapper blockquote p {
+  margin: 0.5em 0;
+}
+
+body.crt:not(.terminal-mode) .markdown-wrapper blockquote p:first-child {
+  margin-top: 0;
+}
+
+body.crt:not(.terminal-mode) .markdown-wrapper blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+/* Responsive design for markdown content */
+@media (max-width: 768px) {
+  body.crt:not(.terminal-mode) .markdown-wrapper {
+    font-size: 16px;
+    padding: 0 10px;
+  }
+
+  body.crt:not(.terminal-mode) .post-title {
+    font-size: 2em;
+  }
+
+  body.crt:not(.terminal-mode) .markdown-wrapper h1 {
+    font-size: 2em;
+  }
+
+  body.crt:not(.terminal-mode) .markdown-wrapper h2 {
+    font-size: 1.75em;
+  }
+
+  body.crt:not(.terminal-mode) .markdown-wrapper h3 {
+    font-size: 1.4em;
+  }
+
+  body.crt:not(.terminal-mode) .markdown-wrapper pre {
+    padding: 15px;
+    font-size: 0.85em;
+  }
+
+  body.crt:not(.terminal-mode) .markdown-wrapper table {
+    font-size: 0.85em;
+    display: block;
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  body.crt:not(.terminal-mode) .markdown-wrapper {
+    font-size: 15px;
+  }
+
+  body.crt:not(.terminal-mode) .post-title {
+    font-size: 1.75em;
+  }
+
+  body.crt:not(.terminal-mode) .markdown-wrapper h1 {
+    font-size: 1.75em;
+  }
+
+  body.crt:not(.terminal-mode) .markdown-wrapper h2 {
+    font-size: 1.5em;
+  }
+
+  body.crt:not(.terminal-mode) .markdown-wrapper h3 {
+    font-size: 1.25em;
+  }
+}
+
 .simple-mode-content {
   max-width: 800px;
   margin: 0 auto;
-  padding: 40px 20px;
+  padding: 20px 20px 40px 20px;
   color: #c9d1d9;
   line-height: 1.8;
 }
 
 .simple-mode-content h1 {
-  font-size: 2.5em;
+  font-size: 3.75em;
   margin-bottom: 20px;
   color: #00ff00;
 }
 
 .simple-mode-content h2 {
-  font-size: 2em;
+  font-size: 3em;
   margin-top: 40px;
   margin-bottom: 20px;
   color: #00ff00;
@@ -760,7 +1336,7 @@ body.crt:not(.terminal-mode) pre code {
 }
 
 .simple-mode-content .about-content {
-  font-size: 1.1em;
+  font-size: 2.2em;
   margin: 20px 0;
 }
 
@@ -791,7 +1367,7 @@ body.crt:not(.terminal-mode) pre code {
 .simple-mode-content .post-link {
   color: #58a6ff;
   text-decoration: none;
-  font-size: 1.2em;
+  font-size: 2.4em;
 }
 
 .simple-mode-content .post-link:hover {
@@ -800,7 +1376,135 @@ body.crt:not(.terminal-mode) pre code {
 
 .simple-mode-content .post-meta {
   color: #8b949e;
-  font-size: 0.9em;
+  font-size: 1.35em;
+}
+
+/* Header and footer styling in simple-mode - match blog posts exactly */
+.simple-mode .site-header {
+  display: block !important;
+  background-color: #0d1117 !important;
+  border-bottom: 1px solid rgb(232, 232, 232) !important;
+  padding: 20px 0 !important;
+  margin: 0 !important;
+  position: relative;
+  z-index: 1;
+  width: 100% !important;
+  min-height: 60px;
+}
+
+/* Match blog posts header wrapper styling exactly - full width header, centered content */
+.simple-mode .site-header .wrapper {
+  max-width: 800px !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+  padding: 0 20px !important;
+  display: flex !important;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+  background-color: #0d1117 !important;
+  position: relative;
+}
+
+/* Match blog posts title styling exactly - blue color, 26px, font-weight 300 */
+.simple-mode .site-title {
+  display: block !important;
+  color: rgb(88, 166, 255) !important;
+  text-decoration: none;
+  font-size: 26px !important;
+  font-weight: 300 !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.simple-mode .site-title:hover {
+  color: rgb(88, 166, 255) !important;
+  text-decoration: underline;
+}
+
+/* Match blog posts navigation styling */
+.simple-mode .site-nav {
+  display: flex !important;
+  align-items: center;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.simple-mode .site-nav .trigger {
+  display: flex !important;
+  align-items: center;
+  flex-shrink: 0;
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.simple-mode .site-nav .trigger li {
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.simple-mode .site-nav .nav-trigger {
+  display: none !important;
+}
+
+.simple-mode .site-nav label {
+  display: none !important;
+}
+
+/* Match blog posts link styling exactly - blue color, 16px */
+.simple-mode .page-link {
+  display: inline-block !important;
+  color: rgb(88, 166, 255) !important;
+  text-decoration: none;
+  margin-left: 20px;
+  font-size: 16px !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  transition: color 0.2s ease;
+}
+
+.simple-mode .page-link:hover {
+  color: rgb(88, 166, 255) !important;
+  text-decoration: underline;
+}
+
+.simple-mode .site-footer {
+  background-color: #0d1117;
+  border-top: 1px solid rgba(0, 255, 0, 0.2);
+  padding: 40px 0;
+  margin-top: 40px;
+  color: #8b949e;
+}
+
+.simple-mode .site-footer .wrapper {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 20px;
+  background-color: #0d1117 !important;
+}
+
+.simple-mode .site-footer .footer-col-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.simple-mode .site-footer .footer-col {
+  flex: 1;
+  min-width: 200px;
+}
+
+.simple-mode .site-footer a {
+  color: #58a6ff;
+  text-decoration: none;
+}
+
+.simple-mode .site-footer a:hover {
+  text-decoration: underline;
 }
 
 /* CRT effect integration - moved from inline styles */
@@ -847,5 +1551,105 @@ body.terminal-mode.crt::after {
 
 .kirby-dance {
   display: inline-block;
-  font-size: 1.2em;
+  font-family: 'Courier New', monospace;
+  white-space: pre;
+  
+  /* DESKTOP (Default) */
+  font-size: 15px;
+  line-height: 20px;
 }
+
+.ascii-art-banner {
+  font-family: 'Courier New', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  white-space: pre;
+  margin: 0;
+  padding: 0;
+  display: block;
+  background-color: #0d1117;
+  border: none;
+  position: static;
+  
+  /* DESKTOP (Default) */
+  font-size: 15px;
+  line-height: 20px;
+}
+
+.subtitle-centered {
+  text-align: center;
+  width: 100%;
+}
+
+/* Center help text on all screen sizes (desktop and mobile) */
+.help-text-mobile-center,
+.terminal-line.terminal-info.help-text-mobile-center,
+.help-text-wrapper .help-text-mobile-center {
+  text-align: center !important;
+  width: 100%;
+}
+
+/* Ensure kirby-container and ascii art scroll normally (not fixed) */
+.terminal-line.terminal-info.kirby-container {
+  position: static !important;
+}
+
+.terminal-line.terminal-info.kirby-container pre,
+.kirby-container .ascii-art-banner,
+.kirby-container pre,
+.terminal-mode pre {
+  position: static !important;
+  border: none !important;
+  outline: none !important;
+}
+
+/* Remove any default browser styling from pre in terminal mode */
+.terminal-mode pre.ascii-art-banner {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Welcome message centering on mobile */
+@media (max-width: 768px) {
+  .terminal-line.terminal-info.kirby-container,
+  .terminal-line.terminal-info.kirby-container {
+    text-align: center;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .terminal-output .terminal-line.terminal-info:first-of-type {
+    text-align: center;
+    width: 100%;
+  }
+  
+  .terminal-line.terminal-info:has(+ .kirby-container) {
+    text-align: center;
+    width: 100%;
+  }
+  
+  /* ASCII animation responsive sizing for mobile */
+  /* 100vw = full screen width. Divided by 120 chars ≈ 0.8vw per char */
+  /* We use slightly less (1.6vw) to ensure padding */
+  .kirby-dance {
+    font-size: 2.4vw;  /* Shrinks font to fit the screen width */
+    line-height: 2.4vw; /* Keeps lines tight */
+  }
+  
+  .ascii-art-banner {
+    font-size: 2.4vw;  /* Shrinks font to fit the screen width */
+    line-height: 2.4vw; /* Keeps lines tight */
+  }
+}
+/* Enhanced terminal readability - blockquote and info text spacing */
+.terminal-line.terminal-info {
+  margin: 1em 0;
+}
+
+/* Enhanced terminal readability - improve spacing around empty lines */
+.terminal-line:empty {
+  margin: 0.5em 0;
+  min-height: 0.5em;
+}
+

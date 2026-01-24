@@ -19,30 +19,19 @@
       {%- include footer.html -%}
     {%- endunless -%}
     
-    {%- if page.layout == 'home' -%}
-      <!-- Mode toggle button -->
-      <button class="mode-toggle" id="modeToggle" aria-label="Switch to simple layout">
+    {%- unless page.permalink == '/404.html' -%}
+      <!-- Mode toggle button - available on all pages except 404 (only shown in terminal mode, hidden in simple mode where it's in nav) -->
+      <button class="mode-toggle mode-toggle-fixed" id="modeToggleFixed" aria-label="Switch to simple layout">
         Switch to Simple View
       </button>
+    {%- endunless -%}
+    
+    {%- if page.layout == 'home' -%}
 
       <!-- Simple mode content -->
       <div class="simple-mode" id="simpleMode">
+        {%- include header.html -%}
         <div class="simple-mode-content">
-          <h1>{{ site.title }}</h1>
-          
-          <img src="{{ '/assets/me.png' | relative_url }}" alt="Ashaun with various gourds, 2022">
-          <p><em>me with various gourds, 2022</em></p>
-          
-          <div class="about-content">
-            <p>I've rewritten this quite a bit trying to seem as interesting or as professional as possible,
-            but I've since settled on authenticity as my main focus. I'm a software engineer that likes
-            humans as much as I like tech, and I want to be excellent so that I can quell my existential dread, simple as that. The problem statement that I've worked on resolving over my past 5 years in the game was simple:</p>
-            
-            <blockquote>What does excellence look like to me?</blockquote>
-            
-            <p>After some reflection, life experience, and meditation over various quotes from the greatest philosophers of all time (Kanye West and Marcus Aurelius of course), I've decided on some quantifiable goals that I'd like to reach during my time. This blog is basically to aid me in making these things happen. I'd like to get into the habit of creating the things I think are fun, funny, or that would help humanity, and I'd like to get into the habit of progressing daily and releasing whatever I think would be cool.</p>
-          </div>
-
           {%- if site.posts.size > 0 -%}
             <div class="posts-section">
               <h2>Posts</h2>
@@ -65,6 +54,7 @@
             </div>
           {%- endif -%}
         </div>
+        {%- include footer.html -%}
       </div>
 
       <script>
@@ -81,8 +71,33 @@
           {%- endfor -%}
         ];
       </script>
-      <script src="{{ '/assets/js/terminal.js' | relative_url }}"></script>
     {%- endif -%}
+    
+    <!-- Load terminal script on all pages for URL routing -->
+    <script src="{{ '/assets/js/terminal.js' | relative_url }}"></script>
+    
+    {%- unless page.layout == 'home' -%}
+    <!-- #region agent log -->
+    <script>
+      // Capture blog post header styles for comparison
+      setTimeout(() => {
+        const postHeader = document.querySelector('.site-header');
+        const postWrapper = postHeader?.querySelector('.wrapper');
+        const postTitle = document.querySelector('.site-title');
+        const postLink = document.querySelector('.page-link');
+        if (postHeader && postTitle) {
+          const headerStyles = window.getComputedStyle(postHeader);
+          const headerRect = postHeader.getBoundingClientRect();
+          const wrapperStyles = postWrapper ? window.getComputedStyle(postWrapper) : null;
+          const wrapperRect = postWrapper ? postWrapper.getBoundingClientRect() : null;
+          const titleStyles = window.getComputedStyle(postTitle);
+          const linkStyles = postLink ? window.getComputedStyle(postLink) : null;
+          fetch('http://127.0.0.1:7242/ingest/4e55f62b-0624-4ebe-950c-e34572a11236',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'default.html:78',message:'Blog post header positioning',data:{headerBg:headerStyles.backgroundColor,headerBorder:headerStyles.borderBottom,headerPadding:headerStyles.padding,headerMargin:headerStyles.margin,headerPosition:headerStyles.position,headerTop:headerRect.top,headerLeft:headerRect.left,headerWidth:headerRect.width,headerHeight:headerRect.height,wrapperMaxWidth:wrapperStyles?.maxWidth,wrapperWidth:wrapperRect?.width,wrapperPadding:wrapperStyles?.padding,wrapperMargin:wrapperStyles?.margin,titleColor:titleStyles.color,titleFontSize:titleStyles.fontSize,titleFontWeight:titleStyles.fontWeight,linkColor:linkStyles?.color,linkFontSize:linkStyles?.fontSize,bodyClasses:document.body.className},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+        }
+      }, 100);
+    </script>
+    <!-- #endregion -->
+    {%- endunless -%}
   </body>
 
 </html>
