@@ -6,8 +6,8 @@ permalink: /about/
 
 ![My helpful screenshot](/assets/me.png)
 
-##### me with various gourds, 2022
----
+*me with various gourds, 2022*
+
 I've rewritten this quite a bit trying to seem as interesting or as professional as possible,
 but I've since settled on authenticity as my main focus. I'm a software engineer that likes
 humans as much as I like tech, and I want to be excellent so that I can quell my existential dread, simple as that. The problem statement that I've worked on resolving over my past 5 years in the game was simple: 
