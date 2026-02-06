@@ -28,9 +28,9 @@
     
     {%- if page.layout == 'home' -%}
 
-      <!-- Simple mode content -->
+      <!-- Simple mode content (header with About as sibling of title for alignment) -->
       <div class="simple-mode" id="simpleMode">
-        {%- include header.html -%}
+        {%- include header-simple.html -%}
         <div class="simple-mode-content">
           {%- if site.posts.size > 0 -%}
             <div class="posts-section">

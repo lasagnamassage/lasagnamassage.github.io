@@ -1534,8 +1534,9 @@ d88P     888      "Y8888P"  888  888 "Y888888  "Y88888 888  888          888    
 
     // Check for saved preference (sessionStorage - only persists for tab session)
     const savedMode = sessionStorage.getItem('viewMode');
-    
-    if (savedMode === 'simple') {
+    const isMobileOrTablet = window.matchMedia('(max-width: 1024px)').matches;
+
+    if (isMobileOrTablet || savedMode === 'simple') {
       switchToSimpleMode();
     } else {
       // Ensure simple mode is hidden initially if not in simple mode
@@ -1557,6 +1558,14 @@ d88P     888      "Y8888P"  888  888 "Y888888  "Y88888 888  888          888    
     if (toggleButtonFixed) {
       toggleButtonFixed.addEventListener('click', handleToggle);
     }
+
+    // When viewport becomes mobile/tablet while in terminal mode, switch to simple mode
+    const mobileQuery = window.matchMedia('(max-width: 1024px)');
+    mobileQuery.addEventListener('change', (e) => {
+      if (e.matches && !simpleMode.classList.contains('active')) {
+        switchToSimpleMode();
+      }
+    });
   }
 
   // Simple ASCII art generator for titles
