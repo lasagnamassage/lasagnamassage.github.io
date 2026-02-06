@@ -109,7 +109,6 @@ html, body {
   word-wrap: break-word;
   white-space: pre-wrap;
   overflow: visible;
-  min-height: 1.6em;
   user-select: text;
   -webkit-user-select: text;
   -moz-user-select: text;
